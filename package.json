@@ -1,7 +1,7 @@
 {
-  "name": "ilovesiri",
+  "name": "ilovenagi",
   "version": "1.0.0",
-  "description": "ILOVESIRI - Suite PDF local sin limites con compresion real (Ghostscript). Hace lo de iLovePDF pero mejor.",
+  "description": "ILOVENAGI - Suite de archivos todo-en-uno: PDF, imagenes y mas. Local, sin limites y con compresion real. by NAGI STUDIOS",
   "main": "main.js",
   "author": "NAGI STUDIOS",
   "license": "MIT",
@@ -19,8 +19,8 @@
     "pdf-lib": "^1.17.1"
   },
   "build": {
-    "appId": "com.nagistudios.ilovesiri",
-    "productName": "ILOVESIRI",
+    "appId": "com.nagistudios.ilovenagi",
+    "productName": "ILOVENAGI",
     "copyright": "© 2026 NAGI STUDIOS",
     "publish": [
       { "provider": "github" }
@@ -34,9 +34,17 @@
       "!tools/**",
       "!test/**",
       "!dist/**",
+      "!.git/**",
       "!_err.log",
       "!_out.log",
-      "!**/*.ps1"
+      "!**/*.ps1",
+      "!**/*.token",
+      "!**/.github-token",
+      "!**/.env",
+      "!dist-build.log",
+      "!build/nagi-theme.mp3",
+      "!build/installerSidebar.bmp",
+      "!build/installer.nsh"
     ],
     "win": {
       "target": ["nsis"],
@@ -48,13 +56,13 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "ILOVESIRI",
+      "shortcutName": "ILOVENAGI",
       "menuCategory": "NAGI STUDIOS",
       "installerIcon": "build/icon.ico",
       "uninstallerIcon": "build/icon.ico",
       "installerHeaderIcon": "build/icon.ico",
-      "uninstallDisplayName": "ILOVESIRI - NAGI STUDIOS",
-      "artifactName": "ILOVESIRI-Setup-${version}.${ext}"
+      "uninstallDisplayName": "ILOVENAGI - NAGI STUDIOS",
+      "artifactName": "ILOVENAGI-Setup-${version}.${ext}"
     }
   }
 }

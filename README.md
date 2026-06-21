@@ -1,10 +1,10 @@
-# ILOVESIRI 💗
+# ILOVENAGI 💗
 
 Suite PDF de escritorio (Electron) que hace **todo lo de iLovePDF pero mejor**: sin marcas de agua, sin límites de tamaño y **100% local** (nada se sube a internet). Estética gacha-neón.
 
 ## Arrancar
 
-Doble clic en **`ILOVESIRI.bat`** (la primera vez instala dependencias solo).
+Doble clic en **`ILOVENAGI.bat`** (la primera vez instala dependencias solo).
 O desde terminal:
 
 ```
@@ -42,8 +42,8 @@ Los motores externos se instalan **solos** con `winget` al pulsar **⚙ Componen
 - **LibreOffice** — `TheDocumentFoundation.LibreOffice` (Office)
 - **Tesseract OCR** — `UB-Mannheim.TesseractOCR` (OCR)
 
-> Tras instalar un componente puede hacer falta cerrar y reabrir ILOVESIRI si no se detecta al instante.
+> Tras instalar un componente puede hacer falta cerrar y reabrir ILOVENAGI si no se detecta al instante.
 
 ## Sobre la compresión
 
-El nivel **Recomendada** suele igualar o superar a iLovePDF. Para máximo ahorro usa **Extrema** o el modo **Personalizado** (DPI + calidad JPEG + escala de grises). Si el PDF ya estaba optimizado, ILOVESIRI lo detecta y no lo agranda.
+El nivel **Recomendada** suele igualar o superar a iLovePDF. Para máximo ahorro usa **Extrema** o el modo **Personalizado** (DPI + calidad JPEG + escala de grises). Si el PDF ya estaba optimizado, ILOVENAGI lo detecta y no lo agranda.

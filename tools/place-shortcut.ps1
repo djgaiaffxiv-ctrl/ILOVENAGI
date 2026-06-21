@@ -1,11 +1,11 @@
-# Crea el acceso directo de ILOVESIRI y lo coloca a la derecha del icono "MTG ADVISOR".
+# Crea el acceso directo de ILOVENAGI y lo coloca a la derecha del icono "MTG ADVISOR".
 $ErrorActionPreference = 'Stop'
 
 $proj    = "C:\Users\Nieves\Desktop\Claude Code\ILOVESIRI"
 $electron = Join-Path $proj "node_modules\electron\dist\electron.exe"
 $icon    = Join-Path $proj "build\icon.ico"
 $desktop = [Environment]::GetFolderPath('Desktop')
-$lnkPath = Join-Path $desktop "ILOVESIRI.lnk"
+$lnkPath = Join-Path $desktop "ILOVENAGI.lnk"
 
 # 1) Crear / actualizar el acceso directo
 $ws = New-Object -ComObject WScript.Shell
@@ -14,7 +14,7 @@ $sc.TargetPath       = $electron
 $sc.Arguments        = '.'
 $sc.WorkingDirectory = $proj
 $sc.IconLocation     = "$icon,0"
-$sc.Description       = 'ILOVESIRI - Suite PDF sin limites'
+$sc.Description       = 'ILOVENAGI - Suite PDF sin limites'
 $sc.WindowStyle      = 1
 $sc.Save()
 Write-Host "Acceso directo creado: $lnkPath"
@@ -102,7 +102,7 @@ public static string Place(string target, string move) {
     int nx = tx + cx, ny = ty;
     IntPtr lp = (IntPtr)(((ny & 0xFFFF) << 16) | (nx & 0xFFFF));
     SendMessage(lv, LVM_SETITEMPOSITION, (IntPtr)mi, lp);
-    return (auto?"WARN_AUTOARRANGE":"OK")+"; MTG en ("+tx+","+ty+") -> ILOVESIRI en ("+nx+","+ny+"); paso="+cx;
+    return (auto?"WARN_AUTOARRANGE":"OK")+"; MTG en ("+tx+","+ty+") -> ILOVENAGI en ("+nx+","+ny+"); paso="+cx;
   } finally {
     VirtualFreeEx(hp,pItem,0,MEM_RELEASE); VirtualFreeEx(hp,pText,0,MEM_RELEASE); VirtualFreeEx(hp,pPt,0,MEM_RELEASE);
     CloseHandle(hp);
@@ -114,7 +114,7 @@ public static string Place(string target, string move) {
 $result = $null
 for ($try=0; $try -lt 6; $try++) {
   Start-Sleep -Milliseconds 900
-  $result = [Win.Desk]::Place('MTG ADVISOR','ILOVESIRI')
-  if ($result -notmatch "no se encontro el icono 'ILOVESIRI'") { break }
+  $result = [Win.Desk]::Place('MTG ADVISOR','ILOVENAGI')
+  if ($result -notmatch "no se encontro el icono 'ILOVENAGI'") { break }
 }
 Write-Host "POSICION: $result"

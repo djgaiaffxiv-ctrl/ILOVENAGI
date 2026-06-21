@@ -1,5 +1,5 @@
 'use strict';
-// ILOVESIRI - Proceso principal de Electron.
+// ILOVENAGI - Proceso principal de Electron.
 
 const { app, BrowserWindow, ipcMain, dialog, shell, webContents } = require('electron');
 const path = require('path');
@@ -25,7 +25,7 @@ function initAutoUpdate() {
     const r = await dialog.showMessageBox(win, {
       type: 'info', buttons: ['Reiniciar ahora', 'Mas tarde'], defaultId: 0, cancelId: 1,
       title: 'Actualizacion lista',
-      message: 'ILOVESIRI ' + i.version + ' se ha descargado.',
+      message: 'ILOVENAGI ' + i.version + ' se ha descargado.',
       detail: 'Se instalara al reiniciar la aplicacion.'
     });
     if (r.response === 0) autoUpdater.quitAndInstall();
@@ -42,7 +42,7 @@ function createWindow() {
     minWidth: 900,
     minHeight: 640,
     backgroundColor: '#0b0717',
-    title: 'ILOVESIRI',
+    title: 'ILOVENAGI',
     frame: false,               // ventana sin marco: barra de titulo propia (premium)
     titleBarStyle: 'hidden',
     icon: path.join(__dirname, 'build', 'icon.ico'),

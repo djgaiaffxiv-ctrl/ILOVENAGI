@@ -54,7 +54,7 @@ const TOOLS = [
   { id:'watermark', icon:'💧', title:'Marca de agua', desc:'Anade texto en diagonal sobre cada pagina.',
     accept:'pdf', mode:'batch',
     options:[
-      { key:'text', type:'text', label:'Texto', placeholder:'CONFIDENCIAL', default:'ILOVESIRI' },
+      { key:'text', type:'text', label:'Texto', placeholder:'CONFIDENCIAL', default:'ILOVENAGI' },
       { key:'size', type:'range', label:'Tamano', min:18, max:120, step:2, default:54, suffix:'pt' },
       { key:'opacity', type:'range', label:'Opacidad', min:5, max:100, step:5, default:25, suffix:'%', pct:true },
       { key:'color', type:'color', label:'Color', default:'#ff4fa3' },
