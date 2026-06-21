@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self';" />
+  <title>ILOVESIRI</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="aurora"></div>
+  <div class="win-border"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <img class="logo-img" src="logo.jpg" alt="ILOVESIRI" />
+      <span class="tag">PDF sin limites</span>
+    </div>
+    <div class="top-actions">
+      <button id="btnComponents" class="ghost-btn">⚙ Componentes <span id="depDot" class="dot"></span></button>
+      <div class="win-controls">
+        <button id="winMin" class="wc" title="Minimizar"><svg viewBox="0 0 12 12"><rect x="2" y="5.4" width="8" height="1.2"/></svg></button>
+        <button id="winMax" class="wc" title="Maximizar"><svg viewBox="0 0 12 12"><rect x="2.2" y="2.2" width="7.6" height="7.6" fill="none" stroke-width="1.2"/></svg></button>
+        <button id="winClose" class="wc close" title="Cerrar"><svg viewBox="0 0 12 12"><path d="M2.5 2.5 L9.5 9.5 M9.5 2.5 L2.5 9.5" stroke-width="1.3"/></svg></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- VISTA: rejilla de herramientas -->
+  <main id="home" class="home">
+    <img class="hero-logo" src="logo.jpg" alt="ILOVESIRI" />
+    <h1 class="hero">Todas tus herramientas PDF <em>en un solo sitio</em></h1>
+    <p class="hero-sub">Sin marcas de agua, sin limites de tamano, sin subir nada a internet. Todo en tu PC.</p>
+    <div id="grid" class="grid"></div>
+  </main>
+
+  <!-- VISTA: herramienta -->
+  <section id="toolView" class="tool-view hidden">
+    <button id="backBtn" class="back">← Volver</button>
+    <div class="tool-head">
+      <span id="toolIcon" class="tool-icon"></span>
+      <div>
+        <h2 id="toolTitle"></h2>
+        <p id="toolDesc"></p>
+      </div>
+    </div>
+
+    <div class="work">
+      <div id="dropzone" class="dropzone">
+        <div class="dz-inner">
+          <div class="dz-icon">⬆</div>
+          <p id="dzText">Arrastra archivos aqui</p>
+          <button id="pickBtn" class="primary-btn">Seleccionar archivos</button>
+        </div>
+      </div>
+
+      <ul id="fileList" class="file-list"></ul>
+
+      <div id="options" class="options"></div>
+
+      <div class="run-row">
+        <button id="runBtn" class="primary-btn big" disabled>Procesar</button>
+        <span id="runHint" class="run-hint"></span>
+      </div>
+
+      <div id="result" class="result hidden"></div>
+
+      <details id="logBox" class="log-box hidden">
+        <summary>Registro tecnico</summary>
+        <pre id="logPre"></pre>
+      </details>
+    </div>
+  </section>
+
+  <!-- MODAL: componentes / dependencias -->
+  <div id="depModal" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>Componentes</h3>
+        <button id="depClose" class="x">✕</button>
+      </div>
+      <p class="modal-sub">ILOVESIRI usa estos motores gratuitos. Se instalan solos cuando los necesitas.</p>
+      <div id="depList" class="dep-list"></div>
+      <pre id="depLog" class="dep-log hidden"></pre>
+    </div>
+  </div>
+
+  <div id="overlay" class="overlay hidden">
+    <div class="spinner"></div>
+    <p id="overlayText">Procesando...</p>
+  </div>
+
+  <footer data-nagi-credit="1" style="position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:9px;padding:18px 16px 22px;font-family:'Segoe UI',system-ui,sans-serif;font-size:12.5px;letter-spacing:.05em;color:#9aa0b0;border-top:1px solid rgba(255,255,255,.08);background:transparent;"><img src="data:image/png;base64,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" alt="NAGI STUDIOS" width="22" height="22" style="display:block;opacity:.95;border-radius:5px;" /><span>&copy; 2026 <strong style="color:#56BFC2;font-weight:700;letter-spacing:.09em;text-transform:uppercase;">NAGI STUDIOS</strong></span></footer>
+  <script src="renderer.js"></script>
+</body>
+</html>

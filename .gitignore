@@ -1,0 +1,9 @@
+node_modules/
+dist/
+*.log
+_*.log
+.env
+*.token
+.github-token
+Thumbs.db
+.DS_Store

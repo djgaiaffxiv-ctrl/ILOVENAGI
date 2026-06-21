@@ -1,0 +1,60 @@
+{
+  "name": "ilovesiri",
+  "version": "1.0.0",
+  "description": "ILOVESIRI - Suite PDF local sin limites con compresion real (Ghostscript). Hace lo de iLovePDF pero mejor.",
+  "main": "main.js",
+  "author": "NAGI STUDIOS",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win nsis"
+  },
+  "devDependencies": {
+    "electron": "^32.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.16",
+    "electron-updater": "^6.3.9",
+    "pdf-lib": "^1.17.1"
+  },
+  "build": {
+    "appId": "com.nagistudios.ilovesiri",
+    "productName": "ILOVESIRI",
+    "copyright": "© 2026 NAGI STUDIOS",
+    "publish": [
+      { "provider": "github" }
+    ],
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "**/*",
+      "!tools/**",
+      "!test/**",
+      "!dist/**",
+      "!_err.log",
+      "!_out.log",
+      "!**/*.ps1"
+    ],
+    "win": {
+      "target": ["nsis"],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "ILOVESIRI",
+      "menuCategory": "NAGI STUDIOS",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico",
+      "uninstallDisplayName": "ILOVESIRI - NAGI STUDIOS",
+      "artifactName": "ILOVESIRI-Setup-${version}.${ext}"
+    }
+  }
+}
