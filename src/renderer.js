@@ -107,8 +107,10 @@ const TOOLS = [
     options:[
       { key:'password', type:'password', label:'Contrasena actual (si la tiene)', placeholder:'opcional', default:'' }
     ] },
-  { id:'unprotect-excel', icon:'📊', title:'Desproteger Excel', desc:'Quita la proteccion de hojas/libro de .xlsx/.xlsm (sin necesidad de contrasena).',
+  { id:'unprotect-excel', icon:'📊', title:'Desproteger Excel', desc:'Quita la proteccion de hojas/libro sin contrasena. Acepta todos los formatos: xlsx, xlsm, xls, xlsb y ods.',
     accept:'excel', mode:'batch' },
+  { id:'textcase', icon:'🔤', title:'Mayúsculas / minúsculas', desc:'Pega texto y conviértelo a MAYÚSCULAS, minúsculas, Capitalizado o Tipo frase. Copia con un clic.',
+    accept:'none', mode:'text' },
   { id:'office2pdf', icon:'📄', title:'Office a PDF', desc:'Word, Excel y PowerPoint a PDF (motor LibreOffice).',
     accept:'office', mode:'combine' },
   { id:'pdf2office', icon:'📝', title:'PDF a Office', desc:'Convierte PDF a Word, Excel o PowerPoint (aproximado).',
@@ -160,12 +162,61 @@ function openTool(t){
   $('#result').classList.add('hidden');
   $('#logBox').classList.add('hidden');
   $('#logPre').textContent = '';
-  renderOptions();
-  renderFiles();
+  // Herramientas de texto (sin archivos): ocultar zona de archivos y boton procesar
+  const isText = t.mode === 'text';
+  $('#dropzone').style.display = isText ? 'none' : '';
+  $('#fileList').style.display = isText ? 'none' : '';
+  document.querySelector('.run-row').style.display = isText ? 'none' : '';
+  if(isText){ buildTextPanel(); }
+  else { renderOptions(); renderFiles(); }
   window.scrollTo(0,0);
 }
+
+// ---------- herramienta de texto: MAYUS/minus ----------
+function tcTransform(s, op){
+  if(op==='upper') return s.toUpperCase();
+  if(op==='lower') return s.toLowerCase();
+  if(op==='title') return s.toLowerCase().replace(/[\p{L}\p{N}]+/gu, w => w.charAt(0).toUpperCase()+w.slice(1));
+  if(op==='sentence') return s.toLowerCase().replace(/(^\s*[\p{L}])|([.!?…]\s*[\p{L}])/gu, m => m.toUpperCase());
+  return s;
+}
+function buildTextPanel(){
+  const box = $('#options');
+  let op = 'upper';
+  box.innerHTML =
+    '<div class="opt-row"><label>Texto</label>'+
+    '<textarea id="tcIn" class="tc-area" placeholder="Escribe o pega aquí tu texto…"></textarea></div>'+
+    '<div class="opt-row"><label>Convertir a</label><div class="chips" id="tcOps">'+
+      '<button class="chip active" data-op="upper">MAYÚSCULAS</button>'+
+      '<button class="chip" data-op="lower">minúsculas</button>'+
+      '<button class="chip" data-op="title">Capitalizar Palabras</button>'+
+      '<button class="chip" data-op="sentence">Tipo frase</button>'+
+    '</div></div>'+
+    '<div class="opt-row"><label>Resultado</label>'+
+    '<textarea id="tcOut" class="tc-area" readonly placeholder="Aquí aparece el resultado…"></textarea>'+
+    '<div class="tc-actions"><button id="tcCopy" class="primary-btn">Copiar resultado</button>'+
+    '<span id="tcCount" class="hint"></span></div></div>';
+  const apply = () => {
+    const v = $('#tcIn').value;
+    $('#tcOut').value = tcTransform(v, op);
+    $('#tcCount').textContent = v.length + ' caracteres';
+  };
+  $('#tcIn').oninput = apply;
+  box.querySelectorAll('#tcOps .chip').forEach(b => b.onclick = () => {
+    op = b.dataset.op;
+    box.querySelectorAll('#tcOps .chip').forEach(x => x.classList.remove('active'));
+    b.classList.add('active'); apply();
+  });
+  $('#tcCopy').onclick = () => {
+    const o = $('#tcOut'); if(!o.value) return;
+    o.select(); try { document.execCommand('copy'); } catch(_){}
+    window.getSelection().removeAllRanges();
+    showToast('Copiado al portapapeles ✓');
+  };
+  apply();
+}
 function acceptText(t){
-  const m = {pdf:'PDF', images:'imagenes JPG/PNG', excel:'archivos Excel (.xlsx)', office:'documentos de Office', any:'archivos'};
+  const m = {pdf:'PDF', images:'imagenes JPG/PNG', excel:'hojas de cálculo (xlsx, xls, ods…)', office:'documentos de Office', any:'archivos'};
   const plural = (t.mode==='single')?'el archivo':'los archivos';
   return `Arrastra ${plural} ${m[t.accept]||''} aqui`;
 }
@@ -509,16 +560,31 @@ async function refreshDeps(){
   });
   list.querySelectorAll('[data-inst]').forEach(b=> b.onclick=()=>installDep(b.dataset.inst));
   $('#depDot').className = 'dot ' + (allCore?'ok':'warn');
+  // boton "Instalar todo" si falta alguno
+  const missing = Object.entries(st).filter(([k,d])=>!d.installed).map(([k])=>k);
+  if(missing.length){
+    const wrap=document.createElement('div'); wrap.style.marginTop='14px';
+    wrap.innerHTML = `<button id="instAll" class="primary-btn big" style="width:100%">⬇ Instalar todo (${missing.length})</button>`;
+    list.appendChild(wrap);
+    $('#instAll').onclick=()=>installAll(missing);
+  }
 }
 let installing=false;
 async function installDep(key){
   if(installing) return; installing=true;
-  const log=$('#depLog'); log.classList.remove('hidden'); log.textContent='';
-  const btns=$$('#depList [data-inst]'); btns.forEach(b=>b.disabled=true);
+  const log=$('#depLog'); log.classList.remove('hidden');
+  const btns=$$('#depList [data-inst], #instAll'); btns.forEach(b=>b.disabled=true);
+  log.textContent += '\n— Instalando '+key+' —\n';
   const r = await window.siri.installDep(key);
-  log.textContent += '\n' + (r.ok ? '✔ '+r.message : '✘ '+r.message) + '\n';
+  log.textContent += (r.ok ? '✔ '+r.message : '✘ '+r.message) + '\n';
   installing=false;
   await refreshDeps();
+  return r;
+}
+async function installAll(keys){
+  if(installing) return;
+  for(const key of keys){ await installDep(key); }
+  showToast('Componentes instalados ✓');
 }
 
 // ---------- eventos ----------

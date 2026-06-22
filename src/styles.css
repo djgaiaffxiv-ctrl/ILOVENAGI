@@ -177,6 +177,13 @@ body.maximized .win-border{border-radius:0;border-color:rgba(255,138,212,.25)}
 .pv-empty{color:var(--muted);font-size:14px;text-align:center;padding:24px}
 .pv-label{color:var(--pink2);font-size:13px;font-weight:600;letter-spacing:.5px}
 
+/* conversor de texto MAYUS/minus */
+.tc-area{width:100%;min-height:120px;resize:vertical;background:rgba(255,255,255,.05);
+  border:1px solid var(--card-brd);color:var(--text);border-radius:12px;padding:12px 14px;
+  font-size:14px;line-height:1.5;outline:none;font-family:inherit}
+.tc-area:focus{border-color:var(--pink)}
+.tc-actions{display:flex;align-items:center;gap:14px;margin-top:10px}
+
 .options{margin-top:20px;display:flex;flex-direction:column;gap:16px}
 .options:empty{margin:0}
 .opt-row{display:flex;flex-direction:column;gap:7px}

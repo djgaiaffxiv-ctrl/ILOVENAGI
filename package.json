@@ -1,6 +1,6 @@
-{
+﻿{
   "name": "ilovenagi",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "ILOVENAGI - Suite de archivos todo-en-uno: PDF, imagenes y mas. Local, sin limites y con compresion real. by NAGI STUDIOS",
   "main": "main.js",
   "author": "NAGI STUDIOS",
@@ -21,7 +21,7 @@
   "build": {
     "appId": "com.nagistudios.ilovenagi",
     "productName": "ILOVENAGI",
-    "copyright": "© 2026 NAGI STUDIOS",
+    "copyright": "Â© 2026 NAGI STUDIOS",
     "publish": [
       { "provider": "github" }
     ],

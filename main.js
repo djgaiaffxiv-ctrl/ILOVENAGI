@@ -108,7 +108,7 @@ ipcMain.handle('pick-files', async (e, kind) => {
   const filters = {
     pdf: [{ name: 'PDF', extensions: ['pdf'] }],
     images: [{ name: 'Imagenes', extensions: ['jpg', 'jpeg', 'png', 'webp'] }],
-    excel: [{ name: 'Excel', extensions: ['xlsx', 'xlsm'] }],
+    excel: [{ name: 'Hojas de calculo', extensions: ['xlsx', 'xlsm', 'xltx', 'xltm', 'xls', 'xlsb', 'ods', 'ots'] }],
     office: [{ name: 'Office', extensions: ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp', 'rtf', 'txt'] }],
     any: [{ name: 'Todos', extensions: ['*'] }]
   };
@@ -146,7 +146,7 @@ ipcMain.handle('run', async (e, tool, payload) => {
       case 'office2pdf':   res = await tools.officeToPdf(f, o, ctx()); break;
       case 'pdf2office':   res = await tools.pdfToOffice(f, o, ctx()); break;
       case 'ocr':          res = await tools.ocr(f[0], o, ctx()); break;
-      case 'unprotect-excel': res = await tools.unprotectExcel(f[0], o); break;
+      case 'unprotect-excel': res = await tools.unprotectExcel(f[0], o, ctx()); break;
       default: throw new Error('Herramienta desconocida: ' + tool);
     }
     return { ok: true, ...res };
@@ -174,7 +174,7 @@ ipcMain.handle('run-batch', async (e, tool, files, options) => {
       else if (tool === 'protect') res = await tools.protect(file, options, ctx());
       else if (tool === 'unlock') res = await tools.unlock(file, options, ctx());
       else if (tool === 'ocr') res = await tools.ocr(file, options, ctx());
-      else if (tool === 'unprotect-excel') res = await tools.unprotectExcel(file, options);
+      else if (tool === 'unprotect-excel') res = await tools.unprotectExcel(file, options, ctx());
       else throw new Error('Lote no soportado para ' + tool);
       results.push({ file, ok: true, ...res });
     } catch (err) {
