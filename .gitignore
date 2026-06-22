@@ -7,3 +7,4 @@ _*.log
 .github-token
 Thumbs.db
 .DS_Store
+engines/
