@@ -111,6 +111,9 @@ const TOOLS = [
     accept:'excel', mode:'batch' },
   { id:'textcase', icon:'🔤', title:'Mayúsculas / minúsculas', desc:'Pega texto y conviértelo a MAYÚSCULAS, minúsculas, Capitalizado o Tipo frase. Copia con un clic.',
     accept:'none', mode:'text' },
+  { id:'removebg', icon:'🪄', title:'Quitar fondo', badge:'IA', fire:true,
+    desc:'Borra el fondo con IA (local) y deja un PNG transparente a la MISMA resolución, sin tocar el sujeto. Por lotes.',
+    accept:'images', mode:'removebg' },
   { id:'office2pdf', icon:'📄', title:'Office a PDF', desc:'Word, Excel y PowerPoint a PDF (motor LibreOffice).',
     accept:'office', mode:'combine' },
   { id:'pdf2office', icon:'📝', title:'PDF a Office', desc:'Convierte PDF a Word, Excel o PowerPoint (aproximado).',
@@ -452,6 +455,59 @@ async function processPadsnap(){
   return results;
 }
 
+// ---------- Quitar fondo con IA (preproceso/recomposicion en canvas) ----------
+async function processRemoveBg(){
+  const S = 1024, plane = S * S;
+  const results = [];
+  for(let n=0; n<files.length; n++){
+    const f = files[n];
+    $('#overlayText').textContent = 'Quitando fondo con IA…' + (files.length>1?' ('+(n+1)+'/'+files.length+')':'');
+    try{
+      const rd = await window.siri.readFileB64(f.path);
+      if(!rd.ok) throw new Error(rd.error);
+      const img = await loadImage('data:'+rd.mime+';base64,'+rd.b64);
+      const W = img.naturalWidth, H = img.naturalHeight;
+      // preprocesado: redimensionar a 1024 y normalizar (v/255 - 0.5), orden CHW
+      const pc = document.createElement('canvas'); pc.width=S; pc.height=S;
+      const px = pc.getContext('2d',{willReadFrequently:true});
+      px.drawImage(img, 0, 0, S, S);
+      const d = px.getImageData(0,0,S,S).data;
+      const inp = new Float32Array(3*plane);
+      for(let i=0;i<plane;i++){
+        inp[i]          = d[i*4]/255   - 0.5;
+        inp[plane+i]    = d[i*4+1]/255 - 0.5;
+        inp[2*plane+i]  = d[i*4+2]/255 - 0.5;
+      }
+      const r = await window.siri.bgInfer(inp.buffer);
+      if(!r.ok) throw new Error(r.error || 'fallo de inferencia');
+      const m = new Float32Array(r.mask);
+      // mascara 1024 -> alpha
+      const mc = document.createElement('canvas'); mc.width=S; mc.height=S;
+      const mctx = mc.getContext('2d');
+      const mi = mctx.createImageData(S,S);
+      for(let i=0;i<plane;i++){ const a=m[i]*255; mi.data[i*4]=255; mi.data[i*4+1]=255; mi.data[i*4+2]=255; mi.data[i*4+3]=a; }
+      mctx.putImageData(mi,0,0);
+      // upscale de la mascara a resolucion original (suave) y aplicar como alpha sobre el original intacto
+      const ac = document.createElement('canvas'); ac.width=W; ac.height=H;
+      const actx = ac.getContext('2d',{willReadFrequently:true}); actx.imageSmoothingQuality='high';
+      actx.drawImage(mc, 0, 0, W, H);
+      const alpha = actx.getImageData(0,0,W,H).data;
+      const oc = document.createElement('canvas'); oc.width=W; oc.height=H;
+      const octx = oc.getContext('2d',{willReadFrequently:true});
+      octx.drawImage(img, 0, 0, W, H);
+      const od = octx.getImageData(0,0,W,H);
+      for(let i=0;i<W*H;i++){ od.data[i*4+3] = alpha[i*4+3]; }
+      octx.putImageData(od,0,0);
+      const dataUrl = oc.toDataURL('image/png');
+      const base = rd.name.replace(/\.[^.]+$/,'');
+      const sv = await window.siri.saveDataUrl({ dir:rd.dir, base, suffix:'-sinfondo', ext:'png', dataUrl });
+      if(!sv.ok) throw new Error(sv.error);
+      results.push({ ok:true, outputs:[sv.path], preview: dataUrl, message: rd.name+'  →  PNG transparente '+W+'×'+H+' px' });
+    }catch(e){ results.push({ ok:false, file:f.path, error:e.message }); }
+  }
+  return results;
+}
+
 // ---------- ejecutar ----------
 async function runTool(){
   const overlay=$('#overlay');
@@ -463,6 +519,14 @@ async function runTool(){
   // PadSnap se resuelve en el navegador con Canvas
   if(current.id==='padsnap'){
     try{ showResult(await processPadsnap()); }
+    catch(err){ showError(err.message||String(err)); }
+    finally{ overlay.classList.add('hidden'); }
+    return;
+  }
+  // Quitar fondo (IA local) tambien en el renderer
+  if(current.id==='removebg'){
+    $('#overlayText').textContent = 'Quitando fondo con IA…' + (files.length>1?' (1/'+files.length+')':'');
+    try{ showResult(await processRemoveBg()); }
     catch(err){ showError(err.message||String(err)); }
     finally{ overlay.classList.add('hidden'); }
     return;
@@ -500,6 +564,7 @@ function showResult(results){
   if(oks.length){
     html += `<h4>✅ Listo</h4>`;
     oks.forEach(r=>{
+      if(r.preview) html += `<div class="rb-thumb"><img src="${r.preview}" alt="resultado"/></div>`;
       if(r.message) html += `<div class="msg">${r.message}</div>`;
       (r.outputs||[]).slice(0,40).forEach(p=>{
         const name=p.split(/[\\/]/).pop();

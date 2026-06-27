@@ -21,6 +21,8 @@ contextBridge.exposeInMainWorld('siri', {
   // PadSnap: leer imagen como base64 y guardar el resultado del canvas
   readFileB64: (file) => ipcRenderer.invoke('read-file-b64', file),
   saveDataUrl: (payload) => ipcRenderer.invoke('save-data-url', payload),
+  // Quitar fondo: enviar tensor (ArrayBuffer) y recibir mascara
+  bgInfer: (buf) => ipcRenderer.invoke('bg-infer', buf),
 
   // controles de ventana (frameless)
   winMinimize: () => ipcRenderer.invoke('win:minimize'),

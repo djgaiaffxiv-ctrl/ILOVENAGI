@@ -103,6 +103,42 @@ ipcMain.handle('save-data-url', async (e, { dir, base, suffix, ext, dataUrl }) =
   } catch (err) { return { ok: false, error: err.message }; }
 });
 
+// ---------- IPC: Quitar fondo con IA (ISNet via onnxruntime-node) ----------
+let bgSession = null;
+function bgModelPath() {
+  const cands = [
+    process.resourcesPath ? path.join(process.resourcesPath, 'engines', 'models', 'isnet-fp16.onnx') : null,
+    path.join(__dirname, 'engines', 'models', 'isnet-fp16.onnx')
+  ];
+  for (const c of cands) { try { if (c && fs.existsSync(c)) return c; } catch (_) {} }
+  return null;
+}
+async function getBgSession() {
+  if (bgSession) return bgSession;
+  const ort = require('onnxruntime-node');
+  const mp = bgModelPath();
+  if (!mp) throw new Error('No se encontro el modelo de IA (isnet-fp16.onnx).');
+  bgSession = await ort.InferenceSession.create(mp, { graphOptimizationLevel: 'all' });
+  return bgSession;
+}
+// Recibe el tensor [1,3,1024,1024] (Float32 normalizado), devuelve la mascara 0..1 (1024x1024).
+ipcMain.handle('bg-infer', async (e, buf) => {
+  try {
+    const ort = require('onnxruntime-node');
+    const s = await getBgSession();
+    const input = new Float32Array(buf);
+    const t = new ort.Tensor('float32', input, [1, 3, 1024, 1024]);
+    const res = await s.run({ [s.inputNames[0]]: t });
+    const o = res[s.outputNames[0]].data;
+    let mn = Infinity, mx = -Infinity;
+    for (let i = 0; i < o.length; i++) { const v = o[i]; if (v < mn) mn = v; if (v > mx) mx = v; }
+    const range = (mx - mn) || 1;
+    const mask = new Float32Array(o.length);
+    for (let i = 0; i < o.length; i++) mask[i] = (o[i] - mn) / range;
+    return { ok: true, mask: mask.buffer };
+  } catch (err) { return { ok: false, error: err.message }; }
+});
+
 // ---------- IPC: selector de archivos ----------
 ipcMain.handle('pick-files', async (e, kind) => {
   const filters = {

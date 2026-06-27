@@ -1,6 +1,6 @@
 {
   "name": "ilovenagi",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "ILOVENAGI - Suite de archivos todo-en-uno: PDF, imagenes y mas. Local, sin limites y con compresion real. by NAGI STUDIOS",
   "main": "main.js",
   "author": "NAGI STUDIOS",
@@ -14,8 +14,10 @@
     "electron-builder": "^25.1.8"
   },
   "dependencies": {
+    "@imgly/background-removal": "^1.7.0",
     "adm-zip": "^0.5.16",
     "electron-updater": "^6.3.9",
+    "onnxruntime-node": "^1.27.0",
     "pdf-lib": "^1.17.1"
   },
   "build": {
@@ -23,7 +25,9 @@
     "productName": "ILOVENAGI",
     "copyright": "© 2026 NAGI STUDIOS",
     "publish": [
-      { "provider": "github" }
+      {
+        "provider": "github"
+      }
     ],
     "directories": {
       "output": "dist",
@@ -48,10 +52,18 @@
       "!build/installer.nsh"
     ],
     "extraResources": [
-      { "from": "engines", "to": "engines" }
+      {
+        "from": "engines",
+        "to": "engines"
+      }
+    ],
+    "asarUnpack": [
+      "**/node_modules/onnxruntime-node/**"
     ],
     "win": {
-      "target": ["nsis"],
+      "target": [
+        "nsis"
+      ],
       "icon": "build/icon.ico"
     },
     "nsis": {
